@@ -37,7 +37,7 @@ function Register({
 
     if (password.length > 8 && hasLetter && hasNumber && hasSymbol) return 3;
     if (password.length > 8 || (hasLetter && hasNumber && hasSymbol)) return 2;
-    if (password.length > 6 && (hasLetter || hasNumber)) return 1;
+    if (password.length >= 6 && (hasLetter || hasNumber)) return 1;
 
     return "";
   };

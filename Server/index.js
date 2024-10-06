@@ -12,6 +12,11 @@ import UploadRoute from './Routes/UploadRoute.js';
 // Routes
 const app = express();
 
+app.get('/', (req, res) => {
+    res.send("J");
+});
+
+
 
 // to serve images for public (public folder)
 app.use(express.static('public'));
@@ -30,7 +35,7 @@ mongoose.connect
     ).then(() =>
         app.listen(process.env.PORT, () => console.log(`listening at ${process.env.PORT}`))
     ).catch((error) =>
-        console.log('error')
+        console.log('error', error)
     )
 
 

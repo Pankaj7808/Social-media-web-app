@@ -72,7 +72,6 @@ export const deletePost = async (req, res) => {
 
 
 // Like/Dislike a Post
-
 export const like_dislike_Post = async (req, res) => {
     const id = req.params.id;
 

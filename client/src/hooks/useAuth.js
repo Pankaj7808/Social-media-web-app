@@ -1,54 +1,86 @@
-import axios from 'axios';
-import {useState} from 'react'
+import axios from "axios";
+import { useState } from "react";
+import { useSnackbar } from "notistack";
 
-function useAuth(){
+function useAuth() {
+  const { enqueueSnackbar } = useSnackbar();
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const signUp = async (userData)=>{
-        setLoading(true);
-        try {
-            const response = await axios.post('http://localhost:5000/auth/register', userData);
-            setLoading(false);
-            return response.data;
-        } catch (err) {
-            setLoading(false);
-            setError(err.response ? err.response.data.message : err.message);
-            throw err;
-        }
+  const [loading, setLoading] = useState(false);
+  const getOtp = async (body) => {
+    setLoading(true);
+    try {
+      const res = await axios.post("/auth/get-otp", body);
+      enqueueSnackbar(res?.data?.message || "OTP sent successfully!", {
+        variant: "success",
+      });
+      return true;
+    } catch (err) {
+      enqueueSnackbar(err.response?.data?.message || "Failed to send OTP", {
+        variant: "error",
+      });
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const getOtp = async (email) =>{
-        setLoading(true);
-        try{
-            const res = await axios.post('http://localhost:5000/auth/get-otp', email);
-            setLoading(false);
-            return res.data;
-        }catch(err){
-            setLoading(false);
-            setError(err.response ? err.response.data.message : err.message);
-            throw err;
-        }
+  const signup = async (payload) => {
+    setLoading(true);
+    try {
+      const res = await axios.post("/auth/register", payload);
+      enqueueSnackbar(res?.data?.message || "Registered Successfully.", {
+        variant: "success",
+      });
+      return res;
+    } catch (err) {
+      enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
+      console.log("returning false");
+      return false;
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const verifyOtp = async (payload) =>{
-        setLoading(true);
-        try{
-            const res = await axios.post('http://localhost:5000/auth/verify-otp',payload);
-            setLoading(false);
-            if(res.status===200){
-                console.log("Successfully");
-            }
-            if(res.status ===400){
-                console.log("Incorrect");
-            }
-        }catch(err){
-            setLoading(false);
-            console.log(err);
-        }
+  const login = async (body) => {
+    setLoading(true);
+    try {
+      const res = await axios.post("/auth/login", body);
+      enqueueSnackbar("Login Successfully.", { variant: "success" });
+      return res;
+    } catch (err) {
+      enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
+    } finally {
+      setLoading(false);
     }
+  };
 
-    return { signUp, loading, error, getOtp, verifyOtp };
+  const verifyOtp = async (body) => {
+    setLoading(true);
+    try {
+      const res = await axios.post('/auth/verify-otp', body);
+      enqueueSnackbar(res?.data?.message || "Success", { variant: "success" });
+      return true;
+    } catch (err) {
+      enqueueSnackbar(err?.response?.data?.message || "Something went wrong", { variant: "error" });
+      return false
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (body)  =>{
+    setLoading(true);
+    try{
+      const res = await axios.put('/auth/reset-password', body);
+      enqueueSnackbar(res?.data?.message, { variant: "success" })
+    }catch(err){
+      enqueueSnackbar(err?.response?.data?.message || "Something went wrong", { variant: "error" });
+    }finally{
+      setLoading(false);
+    }
+  }
+  
+
+  return { loading, getOtp, signup, login, verifyOtp, resetPassword };
 }
 
 export default useAuth;

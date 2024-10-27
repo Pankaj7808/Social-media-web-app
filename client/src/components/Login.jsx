@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
   InputAdornment,
   TextField,
   Typography,
@@ -13,15 +14,14 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useContext, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { LoginContext } from "../pages/Login";
+import { LoginContext } from "../pages/Auth";
 
-
-function Login({setLoginOpen, setLoginEmail}) {
+function Login({ handleOpen, loading, login }) {
   const { setShowLogin } = useContext(LoginContext);
   const [showPassword, setShowPassword] = useState(false);
 
   const validationSchema = Yup.object({
-    username: Yup.string()
+    email: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
     password: Yup.string()
@@ -31,12 +31,12 @@ function Login({setLoginOpen, setLoginEmail}) {
 
   const loginForm = useFormik({
     initialValues: {
-      username: "",
+      email: "",
       password: "",
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      alert(JSON.stringify(values));
+      login(values);
     },
   });
 
@@ -48,12 +48,12 @@ function Login({setLoginOpen, setLoginEmail}) {
             <TextField
               variant="outlined"
               label="Email"
-              name="username"
-              value={loginForm.values.username}
+              name="email"
+              value={loginForm.values.email}
               onChange={loginForm.handleChange}
               onBlur={loginForm.handleBlur}
-              error={loginForm.touched.username && Boolean(loginForm.errors.username)}
-              helperText={loginForm.touched.username && loginForm.errors.username}
+              error={loginForm.touched.email && Boolean(loginForm.errors.email)}
+              helperText={loginForm.touched.email && loginForm.errors.email}
               fullWidth
             />
             <TextField
@@ -82,16 +82,23 @@ function Login({setLoginOpen, setLoginEmail}) {
                   </InputAdornment>
                 ),
               }}
-              error={loginForm.touched.password && Boolean(loginForm.errors.password)}
-              helperText={loginForm.touched.password && loginForm.errors.password}
+              error={
+                loginForm.touched.password && Boolean(loginForm.errors.password)
+              }
+              helperText={
+                loginForm.touched.password && loginForm.errors.password
+              }
             />
-              <Button
-                variant="contained"
-                size="large"
-                disableElevation
-                disableRipple
-                onClick={loginForm.handleSubmit}                
-              >
+            <Button
+              variant="contained"
+              size="large"
+              disableElevation
+              disableRipple
+              onClick={loginForm.handleSubmit}
+            >
+              {loading ? (
+                <CircularProgress size={30} />
+              ) : (
                 <Typography
                   variant="subtitle1"
                   fontFamily="Poppins, sans-serif"
@@ -100,7 +107,8 @@ function Login({setLoginOpen, setLoginEmail}) {
                 >
                   Login
                 </Typography>
-              </Button>
+              )}
+            </Button>
           </Box>
           <Box display="flex" gap={1} pt={2}>
             <Typography variant="subtitle2">Don't have an account?</Typography>
@@ -114,13 +122,13 @@ function Login({setLoginOpen, setLoginEmail}) {
             </Typography>
           </Box>
           <Typography
-              color="primary"
-              variant="subtitle2"
-              sx={{ cursor: "pointer" }}
-              onClick={()=>setLoginOpen(true)}
-            >
-              Forget Password?
-            </Typography>
+            color="primary"
+            variant="subtitle2"
+            sx={{ cursor: "pointer" }}
+            onClick={handleOpen}
+          >
+            Forget Password?
+          </Typography>
         </CardContent>
       </Card>
     </Zoom>

@@ -1,11 +1,21 @@
-import './App.css';
-import LoginPage from './pages/Login';
+import "./App.css";
+import "./utils/Axios";
+// import Auth from "./pages/Auth";
+import { SnackbarProvider } from "notistack";
+import Layout from "./pages/Layout";
 
 function App() {
   return (
-    <div className="App">
-      <LoginPage/>
-    </div>
+    <SnackbarProvider
+      maxSnack={3}
+      anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      sx={{ boxShadow: "none" }}
+    >
+      <div className="App">
+        {/* <Auth /> */}
+        <Layout/>
+      </div>
+    </SnackbarProvider>
   );
 }
 

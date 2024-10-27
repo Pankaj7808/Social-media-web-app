@@ -2,37 +2,42 @@ import UserModel from "../Models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import { createClient } from "redis";
+import otpModel from "../Models/otpModel.js";
 
-const client = createClient({
-    password: 'Aqt5RNYsI0adF1udUPUArOEFXnHeMvME',
-    socket: {
-        host: 'redis-13072.c15.us-east-1-2.ec2.redns.redis-cloud.com',
-        port: 13072
-    }
-});
+// Store OTP in the database
+const storeOtp = async (email, otp) => {
+  const newOtp = new otpModel({ email, otp });
+  await newOtp.save();
+};
 
-client.on('error', err => console.log('Redis Client Error', err));
-
-(async () => {
-    await client.connect();
-})();
+// Generate OTP and send it via email
 
 export const generateOtp = async (req, res) => {
-  const { email } = req.body;
+  const { email, old_user } = req.body;
 
   if (!email) {
     return res.status(400).json({ message: "Email is required." });
+  }
+  const oldUser = await UserModel.findOne({ email });
+  if(old_user){
+   if(!oldUser){
+    return res.status(400).json({message:"User not found."})
+   }
+  }else{
+    if (oldUser){
+      return res.status(400).json({message: "Email already exists."})
+    }
   }
 
   // Generate a 6-digit OTP
   const otp = Math.trunc(Math.random() * 1000000)
     .toString()
-    .padStart(6, "0"); // Ensure OTP is 6 digits
+    .padStart(6, "0");
 
   try {
-    await client.set("email", otp);
+    await storeOtp(email, otp);
 
+    // Send OTP via email
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
@@ -59,36 +64,39 @@ export const generateOtp = async (req, res) => {
   }
 };
 
-export const verifyOtp = async (req, res) => {
-  console.log("err")
+// Verify OTP function
+const signup = async (email, otp) => {
+  const storedOtp = await otpModel.findOne({ email }).sort({ createdAt: -1 });
+  if (!storedOtp) {
+    return false;
+  }
+  return storedOtp.otp === otp;
 };
 
-// register new users
+// Register new users
 export const registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
-
-  const salt = await bcrypt.genSalt(10);
-  let pass = password.toString();
-  const hashedPass = await bcrypt.hash(pass, parseInt(salt));
-  req.body.password = hashedPass;
-
-  const newUser = new UserModel(req.body);
+  const { email, password, otp, ...userInfo } = req.body;
 
   try {
-    const oldUser = await UserModel.findOne({ email });
-
-    if (oldUser) {
-      return res.status(400).json({ message: "This User already exists!" });
+    const isOtpValid = await signup(email, otp);
+    if (!isOtpValid) {
+      return res.status(400).json({ message: "Invalid OTP." });
     }
 
-    const user = await newUser.save();
+    const salt = await bcrypt.genSalt(10);
+    const hashedPass = await bcrypt.hash(password, salt);
+
+    const userData = { ...userInfo, email, password: hashedPass };
+
+    const newUser = new UserModel(userData);
+    await newUser.save();
 
     const token = jwt.sign(
-      { email: user.email, id: user._id },
-      process.env.JWT_KEY
+      { email: newUser.email, id: newUser._id },
+      process.env.JWT_KEY,
+      { expiresIn: "1h" }
     );
-
-    res.status(200).json({ user, token });
+    res.status(200).json({ user: newUser, token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -98,17 +106,14 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await UserModel.findOne({ email: email });
-
     if (user) {
       const validity = await bcrypt.compare(password, user.password);
-
       if (!validity) {
         res
           .status(400)
-          .json("Soory, Please enter the correct email or password!");
+          .json({ message: "Please enter the correct email or password" });
       } else {
         const token = jwt.sign(
           { email: user.email, id: user._id },
@@ -119,9 +124,51 @@ export const loginUser = async (req, res) => {
     } else {
       res
         .status(404)
-        .json("Soory, Please enter the correct email or password!");
+        .json({ message: "Please enter the correct email or password!" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+  console.log(otp)
+  try {
+    const storedOtp = await otpModel
+      .findOne({ email: email })
+      .sort({ createdAt: -1 });
+    console.log(storedOtp)
+    if (!storedOtp?.otp || storedOtp?.otp !== otp) {
+      res.status(400).json({ message: "Invalid OTP" });
+    } else {
+      res.status(200).json({ message: "OTP verify successfully." });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Find user by email
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update user password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error });
+  }
+};
+

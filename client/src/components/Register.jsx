@@ -8,28 +8,22 @@ import {
   Typography,
   Zoom,
 } from "@mui/material";
-import React, { createContext, useContext, useEffect } from "react";
-import { LoginContext } from "../pages/Login";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+import React, { useContext } from "react";
+import { LoginContext } from "../pages/Auth";
 import PassStrengthIndicator from "./PassStrengthIndicator";
 
-export const EmailContext = createContext();
-
 function Register({
-  setRegisterOpen,
-  setEmail,
-  emailRef,
-  getOtp,
+  open,
   loading,
-  error,
-  signUp,
+  handleSubmit,
+  registerForm,
 }) {
-  console.log(emailRef);
+
+  console.log(registerForm)
   const { setShowLogin } = useContext(LoginContext);
 
   const getPasswordStrengthMessage = (password) => {
-    if (password.length === 0) return "";
+    if (password?.length === 0) return "";
 
     const hasLetter = /[a-zA-Z]/.test(password);
     const hasNumber = /\d/.test(password);
@@ -42,48 +36,7 @@ function Register({
     return "";
   };
 
-  const registerFormSchema = Yup.object({
-    username: Yup.string().required("Username is required"),
-    email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Confirm Password is required"),
-  });
-
-  const registerForm = useFormik({
-    initialValues: {
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-    validationSchema: registerFormSchema,
-    onSubmit: async (values) => {
-      try {
-          // Call getOtp and wait for it to complete
-          await getOtp({ email: values?.email });
-  
-          // Only set registerOpen to true after getOtp completes
-          setRegisterOpen(true);
-      } catch (error) {
-          // Handle any errors that occur during getOtp
-          console.error("Error getting OTP:", error);
-          // Optionally, show an error message to the user
-      }
-  }
-  });
-
-  useEffect(() => {
-    setEmail(registerForm.values.email);
-  }, [registerForm.values, setEmail]);
-
   return (
-    <EmailContext.Provider value={{ email: registerForm.values.email }}>
       <Zoom in timeout={600}>
         <Card>
           <CardContent>
@@ -108,7 +61,6 @@ function Register({
                 name="email"
                 label="Email"
                 fullWidth
-                ref={emailRef}
                 onBlur={registerForm.handleBlur}
                 error={
                   registerForm.touched.email &&
@@ -138,7 +90,7 @@ function Register({
               />
               <PassStrengthIndicator
                 strength={getPasswordStrengthMessage(
-                  registerForm.values.password
+                  registerForm?.values?.password
                 )}
               />
               <TextField
@@ -164,15 +116,21 @@ function Register({
                 size="large"
                 disableElevation
                 disableRipple
-                onClick={registerForm.handleSubmit}
+                onClick={handleSubmit}
+                disabled={!open && loading}
               >
-                
-                  {loading?<CircularProgress color="inherit"/>:<Typography
-                  variant="subtitle1"
-                  fontFamily="Poppins, sans-serif"
-                  fontWeight="bold"
-                  sx={{ textTransform: "none", letterSpacing: "1px" }}
-                >Sign Up</Typography>}
+                {(!open && loading) ? (
+                  <CircularProgress color="inherit" size={30}/>
+                ) : (
+                  <Typography
+                    variant="subtitle2"
+                    fontFamily="Poppins, sans-serif"
+                    fontWeight="bold"
+                    sx={{ textTransform: "none", letterSpacing: "1px" }}
+                  >
+                    Sign Up
+                  </Typography>
+                )}
               </Button>
             </Box>
             <Box display="flex" gap={1} pt={2}>
@@ -191,7 +149,6 @@ function Register({
           </CardContent>
         </Card>
       </Zoom>
-    </EmailContext.Provider>
   );
 }
 

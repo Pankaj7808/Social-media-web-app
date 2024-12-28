@@ -7,7 +7,7 @@ const UserSchema = mongoose.Schema(
             required: true,
             unique: true
         },
-        username:{
+        name:{
             type: String,
             unique: true
         },
@@ -33,7 +33,9 @@ const UserSchema = mongoose.Schema(
         country: String,
         relationship: String,
         followers: [],
-        following: []
+        following: [],
+        saves:[],
+        searches:[],
     },
     { timestamps: true }
 )

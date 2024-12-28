@@ -19,7 +19,6 @@ function Register({
   registerForm,
 }) {
 
-  console.log(registerForm)
   const { setShowLogin } = useContext(LoginContext);
 
   const getPasswordStrengthMessage = (password) => {
@@ -43,15 +42,15 @@ function Register({
             <Box display="flex" flexDirection="column" gap={3}>
               <TextField
                 variant="outlined"
-                name="username"
-                label="Username"
+                name="name"
+                label="Full Name"
                 onBlur={registerForm.handleBlur}
                 error={
-                  registerForm.touched.username &&
-                  Boolean(registerForm.errors.username)
+                  registerForm.touched.name &&
+                  Boolean(registerForm.errors.name)
                 }
                 helperText={
-                  registerForm.touched.username && registerForm.errors.username
+                  registerForm.touched.name && registerForm.errors.name
                 }
                 onChange={registerForm.handleChange}
                 fullWidth

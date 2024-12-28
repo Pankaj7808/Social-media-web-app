@@ -6,4 +6,28 @@ body, html {
 }
 body{
   background-color: #5268d30e;
+  overflow-y: scroll;
+
 }
+
+
+/* Apply custom scrollbar styles to all elements except the main element */
+*:not(html)::-webkit-scrollbar {
+  width: 8px;  /* Width of the scrollbar */
+}
+
+*:not(html)::-webkit-scrollbar-thumb {
+  background-color: darkgray;  /* Color of the thumb */
+  border-radius: 10px;
+}
+
+*:not(html)::-webkit-scrollbar-track {
+  background: #f1f1f1;  /* Track of the scrollbar */
+}
+
+/* For Firefox: Exclude html element */
+*:not(html) {
+  scrollbar-width: thin;
+  scrollbar-color: darkgray #f1f1f1;
+}
+

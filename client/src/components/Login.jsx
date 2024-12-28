@@ -94,20 +94,13 @@ function Login({ handleOpen, loading, login }) {
               size="large"
               disableElevation
               disableRipple
+              sx={{
+                borderRadius: "20px",
+                textTransform: "none",
+              }}
               onClick={loginForm.handleSubmit}
             >
-              {loading ? (
-                <CircularProgress size={30} />
-              ) : (
-                <Typography
-                  variant="subtitle1"
-                  fontFamily="Poppins, sans-serif"
-                  fontWeight="bold"
-                  sx={{ textTransform: "none", letterSpacing: "1px" }}
-                >
-                  Login
-                </Typography>
-              )}
+              {loading ? <CircularProgress size={30} /> : "Login"}
             </Button>
           </Box>
           <Box display="flex" gap={1} pt={2}>

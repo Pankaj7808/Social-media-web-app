@@ -25,15 +25,14 @@ export const getAllUsers = async (req, res) => {
 
 // get a user
 export const getUser = async (req, res) => {
-    const id = req.params.id;
-
+    const id = req.params.id; //fdgfhgjhkjjhgfdfghj
     try {
 
-        const user = await UserModel.findById(id);
+        const user = await UserModel.findById(id); //undefined - {password: "123456", email: "abc@gmail", _id: "fdgfhgjhkjj}
 
-        if (user) {
-            const { password, ...otherDetails } = user._doc
-            res.status(200).json(otherDetails)
+        if (user) { //
+            const { password, ...otherDetails } = user //
+            res.status(200).json(otherDetails) 
         } else {
             res.status(404).json("Please, Try again it is invaild user!")
         }

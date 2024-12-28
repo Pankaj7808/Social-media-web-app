@@ -48,12 +48,10 @@ export default function RightSideBar() {
       sx={{
         width: 240,
         padding: 2,
-        position: "fixed", // Changed to fixed
         top: "73px",
         right: "0",
         height: "calc(100vh - 106px)",
         borderRight: "1px solid #ddd",
-        zIndex: 9, // Ensures content spacing
         backgroundColor: "#fff",
         overflowY:"scroll"
       }}

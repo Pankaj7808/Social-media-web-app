@@ -1,9 +1,15 @@
 import axios from "axios";
 import { useState } from "react";
 import { useSnackbar } from "notistack";
+import { setAuth } from "../slice/AuthSlice";
+import { useDispatch } from "react-redux";
+
+
 
 function useAuth() {
   const { enqueueSnackbar } = useSnackbar();
+
+  const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(false);
   const getOtp = async (body) => {
@@ -27,13 +33,18 @@ function useAuth() {
     setLoading(true);
     try {
       const res = await axios.post("/auth/register", payload);
-      enqueueSnackbar(res?.data?.message || "Registered Successfully.", {
+      dispatch(
+        setAuth({
+          isLoggedIn: true,
+          user: res?.data?.user,
+        })
+      );
+      enqueueSnackbar("Registered Successfully.", {
         variant: "success",
       });
       return res;
     } catch (err) {
-      enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
-      console.log("returning false");
+      enqueueSnackbar(err?.response?.data?.message || "Error in Singup"+err, { variant: "error" });
       return false;
     } finally {
       setLoading(false);
@@ -44,6 +55,12 @@ function useAuth() {
     setLoading(true);
     try {
       const res = await axios.post("/auth/login", body);
+      dispatch(setAuth({
+        isLoggedIn: true,
+        token: res?.data?.token,
+        user: res?.data?.user,
+      }));
+      window.location = "/home"
       enqueueSnackbar("Login Successfully.", { variant: "success" });
       return res;
     } catch (err) {
@@ -67,18 +84,18 @@ function useAuth() {
     }
   };
 
-  const resetPassword = async (body)  =>{
+  const resetPassword = async (body) => {
     setLoading(true);
-    try{
+    try {
       const res = await axios.put('/auth/reset-password', body);
       enqueueSnackbar(res?.data?.message, { variant: "success" })
-    }catch(err){
+    } catch (err) {
       enqueueSnackbar(err?.response?.data?.message || "Something went wrong", { variant: "error" });
-    }finally{
+    } finally {
       setLoading(false);
     }
   }
-  
+
 
   return { loading, getOtp, signup, login, verifyOtp, resetPassword };
 }

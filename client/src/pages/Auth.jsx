@@ -29,7 +29,7 @@ function Auth() {
   };
 
   const registerFormSchema = Yup.object({
-    username: Yup.string().required("Username is required"),
+    name: Yup.string().required("Full Name is required"),
     email: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
@@ -46,28 +46,31 @@ function Auth() {
 
   const registerForm = useFormik({
     initialValues: {
-      username: "",
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
       otp: "",
     },
     validationSchema: registerFormSchema,
-    onSubmit: async (values) => handleSignup(values),
+    onSubmit: async (values) => {
+      handleSignup(values);
+      setShowLogin(true);
+    },
   });
 
   const handleVerification = async () => {
     // Mark all fields as touched to trigger validation messages
     registerForm.setTouched({
-      username: true,
+      name: true,
       email: true,
       password: true,
       confirmPassword: true,
     });
-  
+
     // Run validation
     const errors = await registerForm.validateForm();
-  
+
     // Proceed if there are no validation errors
     if (Object.keys(errors).length === 1) {
       const resp = await getOtp({
@@ -77,7 +80,6 @@ function Auth() {
       resp && setRegisterOpen(true);
     }
   };
-  
 
   const handleOpen = () => {
     setLoginOpen(true);

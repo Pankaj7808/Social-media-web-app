@@ -19,9 +19,13 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: "Poppins, sans-serif", // Set Poppins as the default font family for the entire project
-    allVariants: {
-      color: "#000000", // Set the default text color to black
-    },
+    // allVariants: {
+    //   color: "#000000", // Set the default text color to black
+    // },
+  },
+  text: {
+    primary: '#000', // or whatever color you want for text
+    secondary: '#888',
   },
 });
 

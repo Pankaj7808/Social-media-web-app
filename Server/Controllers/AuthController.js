@@ -91,12 +91,12 @@ export const registerUser = async (req, res) => {
     const newUser = new UserModel(userData);
     await newUser.save();
 
-    const token = jwt.sign(
-      { email: newUser.email, id: newUser._id },
-      process.env.JWT_KEY,
-      { expiresIn: "1h" }
-    );
-    res.status(200).json({ user: newUser, token });
+      const token = jwt.sign(
+        { email: newUser.email, id: newUser._id },
+        process.env.JWT_KEY
+      );
+      console.log(token)
+    res.status(201).json({user:newUser});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -172,3 +172,11 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+//export 
+
+// const a = (req,res)=>{
+//   co
+  // }
+// 
+  // function a (req,res){
+  // }

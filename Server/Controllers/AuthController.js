@@ -8,6 +8,7 @@ import otpModel from "../Models/otpModel.js";
 const storeOtp = async (email, otp) => {
   const newOtp = new otpModel({ email, otp });
   await newOtp.save();
+  console.log('wwww')
 };
 
 // Generate OTP and send it via email

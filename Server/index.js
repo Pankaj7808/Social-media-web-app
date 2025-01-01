@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import AuthRoute from './Routes/AuthRoute.js';
 import UserRoute from './Routes/UserRoute.js';
 import PostRoute from './Routes/PostRoute.js';
+import ProfileRoute from './Routes/ProfileRoute.js'
 
 // Routes
 const app = express();
@@ -42,3 +43,6 @@ app.use('/post', PostRoute);
 
 
 // Model ->.
+app.use('/profile',ProfileRoute);
+
+console.log('hi')

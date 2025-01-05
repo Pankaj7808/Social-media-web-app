@@ -120,7 +120,6 @@ export const listOfFollowing = async (req, res) => {
         };
       })
     );
-
     // Remove any null values from the results
     const validFollowing = following.filter((f) => f !== null);
 

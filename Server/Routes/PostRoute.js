@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Router } from "express";
 import {
   createPost,
   deletePost,
@@ -12,6 +12,7 @@ import {
   editComment,
   getPostLikes,
   savePost,
+  getLikes,
 } from "../Controllers/PostController.js";
 
 const router = express.Router();
@@ -28,5 +29,6 @@ router.get("/:postId/like", getPostLikes);
 router.patch("/:postId/comment/:commentId/like", likeComment);
 router.patch("/:postId/comment/:commentId/edit", editComment);
 router.patch("/:postId/save", savePost);
+router.get("/:id/getlikes",getLikes)
 
 export default router;

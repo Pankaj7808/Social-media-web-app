@@ -382,5 +382,37 @@ export const savePost = async (req, res) => {
   }
 };
 
+//getlikes
+export const getLikes = async (req, res) => {
+  try {
+    const post = await postModel.findById(req.params.id);
+    console.log("Post found:", post);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    if (!post.likes || post.likes.length === 0) {
+      return res.status(404).json({ message: "No likes found for this post" });
+    }
+
+    const likes = await Promise.all(
+      post.likes.map(async (id) => {
+        const user = await UserModel.findById(id); // Adjust UserModel path if necessary
+        if (!user) return null;
+        return {
+          userId: user._id,
+          name: user.name,
+          profilePicture: user.profilePicture,
+        };
+      })
+    );
+
+    const validLikes = likes.filter((like) => like !== null);
+    res.status(200).json({ data: validLikes });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 

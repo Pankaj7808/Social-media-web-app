@@ -16,6 +16,8 @@ const storeOtp = async (email, otp) => {
 export const generateOtp = async (req, res) => {
   const { email, old_user } = req.body;
 
+  console.log("jiii");
+
   if (!email) {
     return res.status(400).json({ message: "Email is required." });
   }

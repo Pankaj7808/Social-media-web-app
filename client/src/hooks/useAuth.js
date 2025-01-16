@@ -62,6 +62,7 @@ function useAuth() {
       }));
       window.location = "/home"
       enqueueSnackbar("Login Successfully.", { variant: "success" });
+      console.log(res);
       return res;
     } catch (err) {
       enqueueSnackbar(err?.response?.data?.message, { variant: "error" });

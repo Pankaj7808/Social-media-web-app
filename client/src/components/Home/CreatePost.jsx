@@ -92,6 +92,8 @@ const PostInput = ({ createPost, getTimeline, user }) => {
 
     const formData = new FormData();
     formData.append("userId", user?._id);
+    console.log(user?._id)
+    console.log(user)
     formData.append("desc", text);
     formData.append("location", location);
 

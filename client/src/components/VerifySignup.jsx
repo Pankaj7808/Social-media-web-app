@@ -3,7 +3,14 @@ import { Box, Button, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import Otp from "./common/Otp";
 
-function VerifySignup({ email, getOtp, loading, registerForm, resetOtp, children }) {
+function VerifySignup({
+  email,
+  getOtp,
+  loading,
+  registerForm,
+  resetOtp,
+  children,
+}) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [resend, setResend] = useState(false);
   const [resendCount, setResendCount] = useState(0);
@@ -28,7 +35,7 @@ function VerifySignup({ email, getOtp, loading, registerForm, resetOtp, children
   }, [resendCount]);
 
   const resendOtp = async () => {
-    await getOtp({email, old_user:false});
+    await getOtp({ email, old_user: false });
     setResendCount((prev) => prev + 1);
     setResend(false);
     setTimeLeft(60);
@@ -37,11 +44,11 @@ function VerifySignup({ email, getOtp, loading, registerForm, resetOtp, children
 
   useEffect(() => {
     registerForm?.setFieldValue("otp", otp.join(""));
-  },[otp]);
+  }, [otp]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setOtp(["", "", "", "", "", ""]);
-  },[resetOtp])
+  }, [resetOtp]);
 
   return (
     <Box p={2}>
@@ -67,7 +74,12 @@ function VerifySignup({ email, getOtp, loading, registerForm, resetOtp, children
           color="primary"
           size="large"
           onClick={registerForm?.handleSubmit}
-          sx={{ mt: 4 }}
+          sx={{
+            borderRadius: "20px",
+            textTransform: "none",
+          }}
+          disableElevation
+          disableRipple
           disabled={registerForm?.errors?.otp}
         >
           Verify OTP

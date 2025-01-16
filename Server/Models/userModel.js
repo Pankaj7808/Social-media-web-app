@@ -32,7 +32,10 @@ const UserSchema = mongoose.Schema(
         worksAt: String,
         country: String,
         relationship: String,
-        followers: [],
+        followers: {
+            type: [String], // Array of user IDs (strings)
+            default: [],    // Default value as an empty array
+        },
         following: [],
         saves:[],
         searches:[],

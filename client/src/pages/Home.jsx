@@ -21,6 +21,7 @@ function Home({ user }) {
   useEffect(() => {
     getTimeline(user?._id);
   }, [user?._id]);
+  console.log(user)
   return (
     <Box display="flex" flexDirection="column">
       <PostInput

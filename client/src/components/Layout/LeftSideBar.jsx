@@ -42,6 +42,10 @@ function LeftSidebar() {
   const handleLinkClick = (route) => {
     navigate(route); // Change the route
   };
+  const handleLogout = () => {
+    localStorage.clear();
+    window.reload();
+  };
 
   return (
     <Box
@@ -147,11 +151,7 @@ function LeftSidebar() {
             </ListItemIcon>
             <ListItemText primary="Help & Support" />
           </ListItem>
-          <ListItem
-            button
-            onClick={() => handleLinkClick("/logout")}
-            sx={{ cursor: "pointer" }}
-          >
+          <ListItem button onClick={handleLogout} sx={{ cursor: "pointer" }}>
             <ListItemIcon>
               <LogoutIcon sx={{ color: "error.main" }} />
             </ListItemIcon>

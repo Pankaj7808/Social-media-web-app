@@ -15,6 +15,8 @@ import { Route, Routes } from "react-router-dom";
 import { ROUTES } from "../routes/route";
 import { useSelector } from "react-redux";
 
+import Home from "./Home.jsx";
+
 function Layout() {
   const user = useSelector((state) => state?.app?.auth?.user);
   return (
@@ -82,20 +84,9 @@ function Layout() {
           <LeftSidebar />
         </Box>
         <Box>
-          <Suspense fallback={<div>Loading...</div>}>
-            <Routes>
-              {ROUTES.map((route, idx) => {
-                return route.component ? (
-                  <Route
-                    key={idx}
-                    path={route.path}
-                    element={<route.component user={user} />}
-                  />
-                ) : null;
-              })}
-            </Routes>
-          </Suspense>
+          <Home user={user}/>
         </Box>
+        <>{console.log(user)}</>
         <Box position="fixed" sx={{ right: 0 }}>
           <RightSideBar />
         </Box>

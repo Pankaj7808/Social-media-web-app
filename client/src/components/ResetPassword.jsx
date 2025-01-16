@@ -118,7 +118,16 @@ function ResetPassword({ getOtp, verifyOtp, resetPassword, loading }) {
                   resetPasswordForm.errors.email
                 }
               />
-              <Button variant="contained" onClick={handleStepOne}>
+              <Button
+                variant="contained"
+                onClick={handleStepOne}
+                sx={{
+                  borderRadius: "20px",
+                  textTransform: "none",
+                }}
+                disableElevation
+                disableRipple
+              >
                 {loading ? <CircularProgress size={30} /> : "Get OTP"}
               </Button>
             </>

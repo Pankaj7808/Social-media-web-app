@@ -42,12 +42,10 @@ function LeftSidebar() {
   const handleLinkClick = (route) => {
     navigate(route); // Change the route
   };
-
   const handleLogout = () => {
     localStorage.clear();
-    // window.location.reload();
+    window.reload();
   };
-  
 
   return (
     <Box

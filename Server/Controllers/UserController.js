@@ -21,6 +21,7 @@ export const getAllUsers = async (req, res) => {
 // get a user
 export const getUser = async (req, res) => {
   const id = req.params.id; //fdgfhgjhkjjhgfdfghj
+  console.log(id)
   try {
     const user = await UserModel.findById(id); //undefined - {password: "123456", email: "abc@gmail", _id: "fdgfhgjhkjj}
 
@@ -29,10 +30,10 @@ export const getUser = async (req, res) => {
       const { password, ...otherDetails } = user; //
       res.status(200).json(otherDetails);
     } else {
-      res.status(404).json("Please, Try again it is invaild user!");
+      res.status(404).json({"message":"Please, Try again it is invaild user!"});
     }
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({"message":"Something went wrong."});
   }
 };
 

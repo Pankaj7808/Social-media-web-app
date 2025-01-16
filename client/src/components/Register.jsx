@@ -117,18 +117,17 @@ function Register({
                 disableRipple
                 onClick={handleSubmit}
                 disabled={!open && loading}
+                sx={{
+                  borderRadius: "20px",
+                  textTransform: "none",
+                }}
               >
                 {(!open && loading) ? (
                   <CircularProgress color="inherit" size={30}/>
                 ) : (
-                  <Typography
-                    variant="subtitle2"
-                    fontFamily="Poppins, sans-serif"
-                    fontWeight="bold"
-                    sx={{ textTransform: "none", letterSpacing: "1px" }}
-                  >
-                    Sign Up
-                  </Typography>
+            
+                    "Sign Up"
+                  
                 )}
               </Button>
             </Box>

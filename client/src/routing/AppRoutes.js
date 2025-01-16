@@ -10,6 +10,10 @@ import { useSelector } from "react-redux";
 import PageNotFound from "../pages/PageNotFound";
 import Auth from "../pages/Auth";
 import Layout from "../pages/Layout";
+import Profile from "../pages/Profile";
+
+import Home from "../pages/Home";
+
 
 const PrivateRoute = ({ children, isLoggedIn }) => {
   const location = useLocation();
@@ -40,10 +44,19 @@ const AppRoutes = () => {
 
           {/* Protected routes */}
           <Route
-            path="/*"
+            path="/home"
             element={
               <PrivateRoute isLoggedIn={isLoggedIn}>
                 <Layout />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute isLoggedIn={isLoggedIn}>
+               <Profile />
               </PrivateRoute>
             }
           />

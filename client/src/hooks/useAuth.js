@@ -96,6 +96,7 @@ function useAuth() {
       setLoading(false);
     }
   }
+  
 
 
   return { loading, getOtp, signup, login, verifyOtp, resetPassword };

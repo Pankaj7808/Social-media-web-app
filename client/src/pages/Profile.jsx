@@ -1,45 +1,60 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
   Button,
   Avatar,
-  ImageListItem,
-  ImageList,
-  Card,
-  CardContent,
-  CardHeader,
+  Tabs,
+  Tab,
+  Paper,
 } from "@mui/material";
 import useProfile from "../hooks/useProfile";
-
 import { useSelector } from "react-redux";
 import PostCard from "../components/Home/PostCard";
+import Grid from "@mui/material/Grid2";
 
 function Profile() {
   const user = useSelector((state) => state?.app?.auth?.user);
   const {
     fetchUserData,
     fetchUserPosts,
+    fetchImageArray,
+    fetchListOfFollowers,
+    fetchListOfFollowing,
+    followAUser,
+    unfollowAUser,
     loading,
     userData,
     postData,
-    Error,
-    fetchImageArray,
-    imageArray,
-    fetchListOfFollowers,
-    follower
+    following,
+    follower,
   } = useProfile();
 
-  useEffect(() => {
-    fetchUserData(user?._id);
-    fetchUserPosts(user?._id);
-    fetchImageArray(user?._id);
-    fetchListOfFollowers(user?._id)
-  }, []);
-  //}, [fetchUserPosts, fetchUserData, fetchImageArray]);
+  const [tabs, setTabs] = useState(0);
 
-  console.log(userData?.data);
-  console.log("user", user);
+  useEffect(() => {
+    if (user?._id) {
+      fetchUserData(user._id);
+      fetchUserPosts(user._id);
+      fetchImageArray(user._id);
+      fetchListOfFollowers(user._id);
+      fetchListOfFollowing(user._id);
+     
+    }
+  }, [user?._id]); // Ensure data is fetched only when user._id is defined
+
+  const handleTabs = (event, newIndex) => {
+    //haa pehele unfolow wla krtiu bd m image k dekhte h where?
+    setTabs(newIndex);
+  };
+
+  const handleFollow = (id) => {
+    if (user?._id) followAUser(user._id, id);
+  };
+
+  const handleUnFollow = (id) => {
+    if (user?._id) unfollowAUser(user._id, id);
+  };
 
   return (
     <Box sx={{ width: "100%", minHeight: "100vh", backgroundColor: "#f0f0f0" }}>
@@ -48,11 +63,11 @@ function Profile() {
         sx={{
           width: "100%",
           height: "300px",
-          backgroundImage: `url(${userData?.data.cover_picture})`,
+          backgroundImage: `url(${userData?.data?.coverPicture || ""})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
-      ></Box>
+      />
 
       {/* Profile Section */}
       <Box
@@ -65,30 +80,26 @@ function Profile() {
           boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
-        {/* Left Section: Profile Picture and Name */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Avatar
             src={
-              userData?.data.profile_pic ||
-              "https://images.pexels.com/photos/3680219/pexels-photo-3680219.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              userData?.data?.profilePicture ||
+              "https://images.pexels.com/photos/3680219/pexels-photo-3680219.jpeg"
             }
-            alt="Profile Picture"
+            alt="Profile"
             sx={{ width: 120, height: 120, marginRight: "20px" }}
           />
-
           <Box>
             <Typography variant="h4" fontWeight="bold">
-              {userData?.data?.name || "Pankaj Mandal"}
+              {userData?.data?.name || "Anonymous User"}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              {userData
-                ? `${userData?.data.follower_count} followers | ${userData?.data.followings_count} following`
-                : "416 followers | 575 following"}
+              {`${userData?.data?.followers || 0} followers | ${
+                userData?.data?.followings || 0
+              } following`}
             </Typography>
           </Box>
         </Box>
-
-        {/* Right Section: Buttons */}
         <Box>
           <Button variant="contained" sx={{ margin: "0 5px" }}>
             Add Friend
@@ -101,49 +112,122 @@ function Profile() {
           </Button>
         </Box>
       </Box>
-      {/* <Box> */}
-        {/* <>{console.log(postData)}</>
-        {postData?.data?.map((data) => {
-          return (
-            <PostCard
-              user={user}
-              // addComment={addComment}
-              // deleteComment={deleteComment}
-              // likeOrDislikePost={likeOrDislikePost}
-              key={data?._id}
-              data={data}
-              // getTimeline={getTimeline}
-              // likeComment={likeComment}
-              // editComment={editComment}
-              // getPostLikes={getPostLikes}
-              // postLikes={postLikes}
-              // savePost={savePost}
-            />
-          );
-        })}
-      </Box> */}
-      <>{fetchListOfFollowers}</>
-      <Card>
-        <CardHeader title="All Photos" />
-        <CardContent>
-          <ImageList
-            sx={{ width: "100%", maxWidth: 900, height: 850 }}
-            cols={3}
-            rowHeight={164}
-          >
-            {imageArray?.data?.map((url, index) => (
-              <ImageListItem key={index}>
-                <img
-                  src={`${url}?w=164&h=164&fit=crop&auto=format`}
-                  srcSet={`${url}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                  alt="User Uploaded"
-                  loading="lazy"
+
+      {/* Tabs Section */}
+      <Paper>
+        <Tabs value={tabs} onChange={handleTabs}>
+          <Tab label="Posts" />
+          <Tab label="Following" />
+          <Tab label="Followers" />
+        </Tabs>
+      </Paper>
+
+      {/* Content Based on Tabs */}
+
+      {tabs === 0 && (
+        <Box>
+          {postData?.data?.length > 0 ? (
+            postData.data.map((data) => (
+              <div>
+                <PostCard
+                  key={data._id}
+                  userId={data.userId}
+                  name={data.name}
+                  desc={data.desc}
+                  likes={data.likes}
+                  images={data.images}
+                  location={data.location}
+                  comments={data.comments}
                 />
-              </ImageListItem>
+                <>{console.log(data.images)}</>
+              </div>
+            ))
+          ) : (
+            <Typography>No posts available</Typography>
+          )}
+        </Box>
+      )}
+      <Box>
+        {tabs == 1 && (
+          <Grid container spacing={2}>
+            {following?.data?.map((item, index) => (
+              <Grid item size={{ xs: 3 }} key={index}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    // gap: 2,//ek sec
+                    padding: "8px 0",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Avatar alt={item.name} src={item?.profilePicture} />
+                    <Typography variant="subtitle1">{item.name}</Typography>
+                  </Box>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    disableElevation
+                    disableRipple
+                    sx={{
+                      textTransform: "none",
+                      borderRadius: "20px",
+                      boxShadow: "none",
+                    }}
+                    onClick={() => handleUnFollow(item.userId)}
+                  >
+                    Unfollow
+                  </Button>
+                </Box>
+              </Grid>
             ))}
-          </ImageList>
-        </CardContent>
-      </Card>
+          </Grid>
+        )}
+      </Box>
+      <Box>
+        {tabs == 2 && (
+          <Grid container spacing={2}>
+            {follower?.data?.map(
+              (
+                item,
+                index //pnkj,tayba,huda
+              ) => (
+                <Grid item size={{ xs: 3 }} key={index}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      // gap: 2,//ek sec
+                      padding: "8px 0",
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                      <Avatar alt={item.name} src={item?.profilePicture} />
+                      <Typography variant="subtitle1">{item.name}</Typography>
+                    </Box>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      disableElevation
+                      disableRipple
+                      sx={{
+                        textTransform: "none",
+                        borderRadius: "20px",
+                        boxShadow: "none",
+                      }}
+                      onClick={() => handleFollow(item.userId)}
+                    >
+                      Follow
+                    </Button>
+                  </Box>
+                </Grid>
+              )
+            )}
+          </Grid>
+        )}
+      </Box>
     </Box>
   );
 }

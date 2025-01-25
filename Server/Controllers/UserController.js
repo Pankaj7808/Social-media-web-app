@@ -21,7 +21,7 @@ export const getAllUsers = async (req, res) => {
 // get a user
 export const getUser = async (req, res) => {
   const id = req.params.id; //fdgfhgjhkjjhgfdfghj
-  console.log(id)
+  console.log(id);
   try {
     const user = await UserModel.findById(id); //undefined - {password: "123456", email: "abc@gmail", _id: "fdgfhgjhkjj}
 
@@ -30,10 +30,12 @@ export const getUser = async (req, res) => {
       const { password, ...otherDetails } = user; //
       res.status(200).json(otherDetails);
     } else {
-      res.status(404).json({"message":"Please, Try again it is invaild user!"});
+      res
+        .status(404)
+        .json({ message: "Please, Try again it is invaild user!" });
     }
   } catch (error) {
-    res.status(500).json({"message":"Something went wrong."});
+    res.status(500).json({ message: "Something went wrong." });
   }
 };
 
@@ -106,7 +108,6 @@ export const followUser = async (req, res) => {
       if (!followUser.followers.includes(_id)) {
         await followUser.updateOne({ $push: { followers: _id } });
         await followingUser.updateOne({ $push: { following: id } });
-
         res.status(200).json("User Followed!");
       } else {
         res.status(403).json("User is Already followed by you");
@@ -144,6 +145,8 @@ export const UnFollowUser = async (req, res) => {
     }
   }
 };
+
+
 
 export const setSearch = async (req, res) => {
   const id = req.params.id;
@@ -187,7 +190,7 @@ export const getSearch = async (req, res) => {
         profilePicture: searchObj.profilePicture,
       };
     });
-    res.status(200).json(data); 
+    res.status(200).json(data);
   } catch (error) {
     res.status(400).json(error);
   }

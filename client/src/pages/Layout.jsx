@@ -10,15 +10,18 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import LeftSidebar from "../components/Layout/LeftSideBar";
 import RightSideBar from "../components/Layout/RightSideBar";
-import { Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
-import { ROUTES } from "../routes/route";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 
 import Home from "./Home.jsx";
+import useUser from "../hooks/useUser.js";
 
 function Layout() {
   const user = useSelector((state) => state?.app?.auth?.user);
+  const { fetchAllUser, users } = useUser();
+  useEffect(() => {
+    fetchAllUser();
+  }, []);
   return (
     <div>
       <AppBar
@@ -80,15 +83,14 @@ function Layout() {
         </Container>
       </AppBar>
       <Box display="flex" mt="74px" gap={3} justifyContent="center">
-        <Box position="fixed" sx={{left:0}}>
+        <Box position="fixed" sx={{ left: 0 }}>
           <LeftSidebar />
         </Box>
         <Box>
-          <Home user={user}/>
+          <Home user={user} />
         </Box>
-        <>{console.log(user)}</>
         <Box position="fixed" sx={{ right: 0 }}>
-          <RightSideBar />
+          <RightSideBar users={users} user={user} />
         </Box>
       </Box>
     </div>

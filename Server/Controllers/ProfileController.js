@@ -8,10 +8,10 @@ export const getUser = async (req, res) => {
       res.status(404).json("User not found");
     } else {
       const data = {
-        profile_pic: user.profilePicture,
-        cover_picture: user.coverPicture,
-        follower_count: user.followers.length,
-        followings_count: user.following.length,
+        profilePicture: user.profilePicture,
+        coverPicture: user.coverPicture,
+        followers: user.followers.length,
+        followings: user.following.length,
         name: user.name,
       };
       res.status(200).json({ data });

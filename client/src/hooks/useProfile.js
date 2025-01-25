@@ -6,18 +6,18 @@ function useProfile() {
   const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [Error, setError] = useState(null);
   const [postData, setPostData] = useState(null);
   const [imageArray, setImageArray] = useState([]);
-  const [follower,setFollower] = useState(null)
+  const [follower, setFollower] = useState([]);
+  const [following, setFollowing] = useState([]);
 
   const fetchUserData = async (userId) => {
     setLoading(true);
     try {
       const res = await axios.get(`/profile/${userId}`);
-      setUserData(res.data); // Save the data
-      //console.log(res.data);
+      setUserData(res.data);
     } catch (err) {
+      enqueueSnackbar("Failed to fetch user data", { variant: "error" });
       console.error(err);
     } finally {
       setLoading(false);
@@ -26,14 +26,12 @@ function useProfile() {
 
   const fetchUserPosts = async (userId) => {
     setLoading(true);
-    setError(null);
     try {
       const res = await axios.get(`/profile/${userId}/posts`);
       setPostData(res.data);
-      console.log(res.data);
     } catch (err) {
-      console.log(err);
-      setError("Failed to load posts...");
+      enqueueSnackbar("Failed to load posts", { variant: "error" });
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -44,42 +42,91 @@ function useProfile() {
     try {
       const res = await axios.get(`/profile/${userId}/images`);
       setImageArray(res.data);
-      enqueueSnackbar(res?.data?.message || "Images fetched successfully", {
-        variant: "success",
-      });
+      enqueueSnackbar("Images fetched successfully", { variant: "success" });
     } catch (err) {
-      enqueueSnackbar(err.response?.data?.message || "Couldn't fetch image", {
-        variant: "error",
-      });
+      enqueueSnackbar("Couldn't fetch images", { variant: "error" });
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
- 
-  const fetchListOfFollowers = async(userId) =>{
-    setLoading(true)
-    try{
-      const res = await axios.get(`/profile/${userId}/followers`)
-      setFollower(res.data)
-      enqueueSnackbar(res?.data?.message || "Followers fetched successfully" , {variant:"success"})
-    }catch(err){
-      enqueueSnackbar(err.response?.data?.message || "Couldn't fetched followers" ,{variant:"error"})
 
-    }finally{
-      setLoading(false)
+  const fetchListOfFollowers = async (userId) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`/profile/${userId}/followers`);
+      setFollower(res.data);
+      enqueueSnackbar("Followers fetched successfully", { variant: "success" });
+    } catch (err) {
+      enqueueSnackbar("Couldn't fetch followers", { variant: "error" });
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
+  const fetchListOfFollowing = async (userId) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`/profile/${userId}/following`);
+      setFollowing(res.data);
+      enqueueSnackbar("Followings fetched successfully", {
+        variant: "success",
+      });
+    } catch (err) {
+      enqueueSnackbar("Couldn't fetch followings", { variant: "error" });
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const followAUser = async  (currentuserId,followuserid,) => {
+    setLoading(true);
+    console.log(followuserid)
+    const data={_id:followuserid} //pass hmm hmm? ook
+    try {
+      const res = await axios.put(`/user/${currentuserId}/follow`,data);   
+      
+      enqueueSnackbar("Followed a user ", { variant: "success" });
+    } catch (err) {
+      enqueueSnackbar("Couldn't follow", { variant: "error" });
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const unfollowAUser = async  (currentuserId,followuserid,) => {
+    setLoading(true);
+    console.log(followuserid)
+    const data={_id:followuserid} //pass hmm hmm? ook
+    try {
+      const res = await axios.put(`/user/${currentuserId}/unfollow`,data);   
+      
+      enqueueSnackbar("unfollowed a user ", { variant: "success" });
+    } catch (err) {
+      enqueueSnackbar("Couldn't unfollow", { variant: "error" });
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     fetchUserData,
+    fetchUserPosts,
+    fetchImageArray,
+    fetchListOfFollowers,
+    fetchListOfFollowing,
+    followAUser,
+    unfollowAUser,
     loading,
     userData,
     postData,
-    Error,
-    fetchUserPosts,
-    fetchImageArray,
     imageArray,
-    fetchListOfFollowers,
     follower,
+    following,
   };
 }
 

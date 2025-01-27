@@ -3,16 +3,16 @@ import { Avatar, Box, Button, Typography } from "@mui/material";
 import useUser from "../../hooks/useUser";
 
 export default function RightSideBar({ users, user }) {
-  const { followUser } = useUser();
+  const { followUser, unFollowUser } = useUser();
 
   const [allUsers, setAllUsers] = useState([]);
 
   const handleFollow = (id) => {
     setAllUsers((prevAllUsers) =>
-      prevAllUsers.map((user) =>
-        user._id === id
-          ? { ...user, followers: [...user.followers, user._id] }
-          : user
+      prevAllUsers.map((item) =>
+        item._id === id
+          ? { ...item, followers: [...item.followers, user._id] }
+          : item
       )
     );
 
@@ -20,9 +20,27 @@ export default function RightSideBar({ users, user }) {
     followUser(data, user._id);
   };
 
-  useEffect(()=>{
+  const handleUnFollow = (id) => {
+    setAllUsers((prevAllUsers) =>
+      prevAllUsers.map((item) =>
+        item._id === id
+          ? {
+              ...item,
+              followers: item.followers.filter(
+                (followerId) => followerId !== user._id
+              ),
+            }
+          : item
+      )
+    );
+
+    const data = { _id: id };
+    unFollowUser(data, user._id);
+  };
+
+  useEffect(() => {
     setAllUsers(users);
-  },[users])
+  }, [users]);
 
   return (
     <Box
@@ -40,7 +58,7 @@ export default function RightSideBar({ users, user }) {
         Suggestions
       </Typography>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
-        {allUsers.map((user, index) => (
+        {allUsers.map((item, index) => (
           <Box
             key={index}
             sx={{
@@ -52,15 +70,17 @@ export default function RightSideBar({ users, user }) {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Avatar alt={user.name} src={user?.profilePicture} />
-              <Typography variant="subtitle1">{user.name}</Typography>
+              <Avatar alt={item.name} src={item?.profilePicture} />
+              <Typography variant="subtitle1">{item?.name}</Typography>
             </Box>
-            {user?.followers?.includes(user?._id) ? (
+            
+            {item?.followers?.includes(user?._id) ? (
               <Button
                 variant="outlined"
                 size="small"
                 disableElevation
                 disableRipple
+                onClick={() => handleUnFollow(item?._id)}
                 sx={{
                   textTransform: "none",
                   borderRadius: "20px",
@@ -80,7 +100,7 @@ export default function RightSideBar({ users, user }) {
                   borderRadius: "20px",
                   boxShadow: "none",
                 }}
-                onClick={() => handleFollow(user?._id)}
+                onClick={() => handleFollow(item?._id)}
               >
                 Follow
               </Button>

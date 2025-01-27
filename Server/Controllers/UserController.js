@@ -94,37 +94,31 @@ export const deleteUser = async (req, res) => {
 // Follow a User
 
 export const followUser = async (req, res) => {
-  const id = req.params.id;
-
   const { _id } = req.body;
-
+  const id = req.params.id;
   if (_id === id) {
     res.status(403).json("Action forbidden");
   } else {
     try {
       const followUser = await UserModel.findById(id);
       const followingUser = await UserModel.findById(_id);
-
       if (!followUser.followers.includes(_id)) {
-        await followUser.updateOne({ $push: { followers: _id } });
-        await followingUser.updateOne({ $push: { following: id } });
-        res.status(200).json("User Followed!");
+        await followUser.updateOne({ $push: { following: _id } });
+        await followingUser.updateOne({ $push: { followers: id } });
+        res.status(200).json({ message: "User Followed!" });
       } else {
         res.status(403).json("User is Already followed by you");
       }
     } catch (error) {
-      res.status(500).json(error);
+      res.status(500).json({ message: error });
     }
   }
 };
 
-// UnFollow a User
 
 export const UnFollowUser = async (req, res) => {
-  const id = req.params.id;
-
   const { _id } = req.body;
-
+  const id = req.params.id;
   if (_id === id) {
     res.status(403).json("Action forbidden");
   } else {
@@ -132,9 +126,9 @@ export const UnFollowUser = async (req, res) => {
       const followUser = await UserModel.findById(id);
       const followingUser = await UserModel.findById(_id);
 
-      if (followUser.followers.includes(_id)) {
-        await followUser.updateOne({ $pull: { followers: _id } });
-        await followingUser.updateOne({ $pull: { following: id } });
+      if (followUser.following.includes(_id)) {
+        await followUser.updateOne({ $pull: { following: _id } });
+        await followingUser.updateOne({ $pull: { followers: id } });
 
         res.status(200).json("User Unfollowed!");
       } else {
@@ -146,14 +140,9 @@ export const UnFollowUser = async (req, res) => {
   }
 };
 
-
-
 export const setSearch = async (req, res) => {
   const id = req.params.id;
   const { searches } = req.body;
-  console.log(id);
-  console.log(searches);
-  console.log(req.body);
   if (!searches) {
     return res.status(400).json({ error: "search not found" });
   }
